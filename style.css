@@ -1,0 +1,188 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0f172a;
+    color: #e5e7eb;
+    min-height: 100vh;
+}
+
+.app {
+    width: 92%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.tag {
+    color: #38bdf8;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #94a3b8;
+}
+
+.mode-switch {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mode-btn,
+button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.mode-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+}
+
+.mode-btn.active {
+    background: #2563eb;
+}
+
+.panel,
+.profile-card,
+.repos-card,
+.battle-card {
+    background: #1e293b;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    gap: 12px;
+}
+
+input {
+    flex: 1;
+    padding: 13px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #020617;
+    color: white;
+    font-size: 15px;
+}
+
+input:focus,
+button:focus {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
+.status,
+.message {
+    text-align: center;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.status {
+    background: #334155;
+}
+
+.message {
+    background: #7f1d1d;
+    color: #fecaca;
+}
+
+.profile-card {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+}
+
+.profile-card img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 4px solid #334155;
+}
+
+.profile-info p {
+    color: #cbd5e1;
+    margin: 8px 0;
+}
+
+a {
+    color: #38bdf8;
+    text-decoration: none;
+}
+
+.repo-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.repo-item {
+    background: #020617;
+    padding: 14px;
+    border-radius: 8px;
+}
+
+.battle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.winner {
+    border: 2px solid #22c55e;
+}
+
+.loser {
+    border: 2px solid #ef4444;
+}
+
+.hidden {
+    display: none;
+}
+
+.sr-only {
+    position: absolute;
+    left: -9999px;
+}
+
+@media (max-width: 700px) {
+
+    form,
+    .profile-card {
+        flex-direction: column;
+    }
+
+    .battle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 32px;
+    }
+}
