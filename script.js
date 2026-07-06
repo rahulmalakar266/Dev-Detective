@@ -1,3 +1,6 @@
+const searchForm = document.getElementById("searchForm");
+const usernameInput = document.getElementById("usernameInput");
+
 const battleForm = document.getElementById("battleForm");
 const firstUserInput = document.getElementById("firstUserInput");
 const secondUserInput = document.getElementById("secondUserInput");
@@ -5,8 +8,7 @@ const secondUserInput = document.getElementById("secondUserInput");
 const singleModeBtn = document.getElementById("singleModeBtn");
 const battleModeBtn = document.getElementById("battleModeBtn");
 const singleSearchPanel = document.getElementById("singleSearchPanel");
-const battlePanel = document.getElementById("battlePanel"); const searchForm = document.getElementById("searchForm");
-const usernameInput = document.getElementById("usernameInput");
+const battlePanel = document.getElementById("battlePanel");
 
 const loader = document.getElementById("loader");
 const messageBox = document.getElementById("messageBox");
@@ -47,7 +49,7 @@ function formatDate(dateString) {
     return date.toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
-        year: "numeric",
+        year: "short"
     });
 }
 
@@ -58,8 +60,17 @@ async function fetchGitHubUser(username) {
         throw new Error("User Not Found");
     }
 
-    const userData = await response.json();
-    return userData;
+    return response.json();
+}
+
+async function fetchUserRepos(reposUrl) {
+    const response = await fetch(`${reposUrl}?sort=updated&per_page=100`);
+
+    if (!response.ok) {
+        throw new Error("Repositories not found");
+    }
+
+    return response.json();
 }
 
 function renderProfile(user) {
@@ -71,7 +82,7 @@ function renderProfile(user) {
 
     profileContainer.innerHTML = `
     <article class="profile-card">
-      <img src="${user.avatar_url}" alt="${user.login} avatar" />
+      <img src="${user.avatar_url}" alt="${user.login} avatar">
 
       <div class="profile-info">
         <h2>${user.name || user.login}</h2>
@@ -97,6 +108,43 @@ function renderProfile(user) {
   `;
 }
 
+function renderRepos(repos) {
+    const latestRepos = repos.slice(0, 5);
+
+    if (latestRepos.length === 0) {
+        reposContainer.innerHTML = `
+      <section class="repos-card">
+        <h3>Latest Repositories</h3>
+        <p>No repositories found.</p>
+      </section>
+    `;
+        return;
+    }
+
+    const repoItems = latestRepos
+        .map((repo) => {
+            return `
+        <div class="repo-item">
+          <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">
+            ${repo.name}
+          </a>
+          <p>Updated: ${formatDate(repo.updated_at)}</p>
+          <p>⭐ ${repo.stargazers_count} stars</p>
+        </div>
+      `;
+        })
+        .join("");
+
+    reposContainer.innerHTML = `
+    <section class="repos-card">
+      <h3>Top 5 Latest Repositories</h3>
+      <div class="repo-list">
+        ${repoItems}
+      </div>
+    </section>
+  `;
+}
+
 async function handleProfileSearch(event) {
     event.preventDefault();
 
@@ -112,7 +160,10 @@ async function handleProfileSearch(event) {
 
     try {
         const user = await fetchGitHubUser(username);
+        const repos = await fetchUserRepos(user.repos_url);
+
         renderProfile(user);
+        renderRepos(repos);
     } catch (error) {
         showMessage("User Not Found. Please try another username.");
     } finally {
@@ -120,7 +171,7 @@ async function handleProfileSearch(event) {
     }
 }
 
-searchForm.addEventListener("submit", handleProfileSearch); function calculateTotalStars(repos) {
+function calculateTotalStars(repos) {
     return repos.reduce((total, repo) => total + repo.stargazers_count, 0);
 }
 
@@ -130,20 +181,20 @@ async function getBattleData(username) {
 
     return {
         user,
-        totalStars: calculateTotalStars(repos),
+        totalStars: calculateTotalStars(repos)
     };
 }
 
 function renderBattleCard(data, status) {
     return `
-      <article class="battle-card ${status}">
-        <h3>${data.user.name || data.user.login}</h3>
-        <p>${data.user.bio || "No bio available."}</p>
-        <p><strong>Total Stars:</strong> ${data.totalStars}</p>
-        <p><strong>Public Repos:</strong> ${data.user.public_repos}</p>
-        <p>${status === "winner" ? "Winner" : "Loser"}</p>
-      </article>
-    `;
+    <article class="battle-card ${status}">
+      <h3>${data.user.name || data.user.login}</h3>
+      <p>${data.user.bio || "No bio available."}</p>
+      <p><strong>Total Stars:</strong> ${data.totalStars}</p>
+      <p><strong>Public Repos:</strong> ${data.user.public_repos}</p>
+      <p><strong>Status:</strong> ${status === "winner" ? "Winner" : "Loser"}</p>
+    </article>
+  `;
 }
 
 async function handleBattleSearch(event) {
@@ -163,7 +214,7 @@ async function handleBattleSearch(event) {
     try {
         const [firstData, secondData] = await Promise.all([
             getBattleData(firstUsername),
-            getBattleData(secondUsername),
+            getBattleData(secondUsername)
         ]);
 
         const firstStatus =
@@ -173,11 +224,11 @@ async function handleBattleSearch(event) {
             secondData.totalStars > firstData.totalStars ? "winner" : "loser";
 
         battleResult.innerHTML = `
-        <section class="battle-grid">
-          ${renderBattleCard(firstData, firstStatus)}
-          ${renderBattleCard(secondData, secondStatus)}
-        </section>
-      `;
+      <section class="battle-grid">
+        ${renderBattleCard(firstData, firstStatus)}
+        ${renderBattleCard(secondData, secondStatus)}
+      </section>
+    `;
     } catch (error) {
         showMessage("One or both GitHub users were not found.");
     } finally {
@@ -188,17 +239,22 @@ async function handleBattleSearch(event) {
 singleModeBtn.addEventListener("click", () => {
     singleSearchPanel.classList.remove("hidden");
     battlePanel.classList.add("hidden");
+
     singleModeBtn.classList.add("active");
     battleModeBtn.classList.remove("active");
+
     clearUI();
 });
 
 battleModeBtn.addEventListener("click", () => {
     battlePanel.classList.remove("hidden");
     singleSearchPanel.classList.add("hidden");
+
     battleModeBtn.classList.add("active");
     singleModeBtn.classList.remove("active");
+
     clearUI();
 });
 
+searchForm.addEventListener("submit", handleProfileSearch);
 battleForm.addEventListener("submit", handleBattleSearch);
