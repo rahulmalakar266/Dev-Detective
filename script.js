@@ -1,4 +1,11 @@
-const searchForm = document.getElementById("searchForm");
+const battleForm = document.getElementById("battleForm");
+const firstUserInput = document.getElementById("firstUserInput");
+const secondUserInput = document.getElementById("secondUserInput");
+
+const singleModeBtn = document.getElementById("singleModeBtn");
+const battleModeBtn = document.getElementById("battleModeBtn");
+const singleSearchPanel = document.getElementById("singleSearchPanel");
+const battlePanel = document.getElementById("battlePanel"); const searchForm = document.getElementById("searchForm");
 const usernameInput = document.getElementById("usernameInput");
 
 const loader = document.getElementById("loader");
@@ -113,4 +120,85 @@ async function handleProfileSearch(event) {
     }
 }
 
-searchForm.addEventListener("submit", handleProfileSearch);
+searchForm.addEventListener("submit", handleProfileSearch); function calculateTotalStars(repos) {
+    return repos.reduce((total, repo) => total + repo.stargazers_count, 0);
+}
+
+async function getBattleData(username) {
+    const user = await fetchGitHubUser(username);
+    const repos = await fetchUserRepos(user.repos_url);
+
+    return {
+        user,
+        totalStars: calculateTotalStars(repos),
+    };
+}
+
+function renderBattleCard(data, status) {
+    return `
+      <article class="battle-card ${status}">
+        <h3>${data.user.name || data.user.login}</h3>
+        <p>${data.user.bio || "No bio available."}</p>
+        <p><strong>Total Stars:</strong> ${data.totalStars}</p>
+        <p><strong>Public Repos:</strong> ${data.user.public_repos}</p>
+        <p>${status === "winner" ? "Winner" : "Loser"}</p>
+      </article>
+    `;
+}
+
+async function handleBattleSearch(event) {
+    event.preventDefault();
+
+    const firstUsername = firstUserInput.value.trim();
+    const secondUsername = secondUserInput.value.trim();
+
+    if (!firstUsername || !secondUsername) {
+        showMessage("Please enter both GitHub usernames.");
+        return;
+    }
+
+    clearUI();
+    showLoader();
+
+    try {
+        const [firstData, secondData] = await Promise.all([
+            getBattleData(firstUsername),
+            getBattleData(secondUsername),
+        ]);
+
+        const firstStatus =
+            firstData.totalStars >= secondData.totalStars ? "winner" : "loser";
+
+        const secondStatus =
+            secondData.totalStars > firstData.totalStars ? "winner" : "loser";
+
+        battleResult.innerHTML = `
+        <section class="battle-grid">
+          ${renderBattleCard(firstData, firstStatus)}
+          ${renderBattleCard(secondData, secondStatus)}
+        </section>
+      `;
+    } catch (error) {
+        showMessage("One or both GitHub users were not found.");
+    } finally {
+        hideLoader();
+    }
+}
+
+singleModeBtn.addEventListener("click", () => {
+    singleSearchPanel.classList.remove("hidden");
+    battlePanel.classList.add("hidden");
+    singleModeBtn.classList.add("active");
+    battleModeBtn.classList.remove("active");
+    clearUI();
+});
+
+battleModeBtn.addEventListener("click", () => {
+    battlePanel.classList.remove("hidden");
+    singleSearchPanel.classList.add("hidden");
+    battleModeBtn.classList.add("active");
+    singleModeBtn.classList.remove("active");
+    clearUI();
+});
+
+battleForm.addEventListener("submit", handleBattleSearch);
