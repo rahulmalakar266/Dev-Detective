@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dev Detective | GitHub Search</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <main class="app">
+        <header class="hero">
+            <p class="tag">Sprint 03 • API Hunter</p>
+            <h1>Dev Detective</h1>
+            <p class="subtitle">
+                Search GitHub profiles, view latest repositories, and compare developers.
+            </p>
+        </header>
+
+        <section class="mode-switch" aria-label="Search mode">
+            <button id="singleModeBtn" class="mode-btn active" type="button">
+                Profile Search
+            </button>
+            <button id="battleModeBtn" class="mode-btn" type="button">
+                Battle Mode
+            </button>
+        </section>
+
+        <section id="singleSearchPanel" class="panel">
+            <form id="searchForm" novalidate>
+                <label for="usernameInput" class="sr-only">GitHub username</label>
+                <input id="usernameInput" type="text" placeholder="Enter GitHub username, e.g. octocat"
+                    autocomplete="off" />
+                <button type="submit">Search</button>
+            </form>
+        </section>
+
+        <section id="battlePanel" class="panel hidden">
+            <form id="battleForm" novalidate>
+                <label for="firstUserInput" class="sr-only">First GitHub username</label>
+                <input id="firstUserInput" type="text" placeholder="First username" autocomplete="off" />
+
+                <label for="secondUserInput" class="sr-only">Second GitHub username</label>
+                <input id="secondUserInput" type="text" placeholder="Second username" autocomplete="off" />
+
+                <button type="submit">Compare</button>
+            </form>
+        </section>
+
+        <div id="loader" class="status hidden" role="status" aria-live="polite">
+            Loading...
+        </div>
+
+        <div id="messageBox" class="message hidden" role="alert"></div>
+
+        <section id="profileContainer"></section>
+        <section id="reposContainer"></section>
+        <section id="battleResult"></section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
